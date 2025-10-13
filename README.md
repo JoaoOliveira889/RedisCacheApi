@@ -16,7 +16,7 @@ The core goal is to showcase how to achieve near-instantaneous API response time
 
 For a detailed, step-by-step tutorial on how this project was built, including the Docker setup, code explanations, and the analysis of the performance gains (Cache Miss vs. Cache Hit), check out the full article:
 
-> **[ARTICLE URL]**
+> **[Article](https://dev.to/joaooliveiratech/distributed-cache-in-net-how-to-configure-and-use-redis-3ehj)**
 
 ---
 

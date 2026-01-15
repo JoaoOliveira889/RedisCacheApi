@@ -1,51 +1,87 @@
-# Redis Cache in .NET API
+# Distributed Cache in .NET: How to Configure and Use Redis
 
-## Project Overview
+> **Article:** [Distributed Cache in .NET: How to Configure and Use Redis](https://dev.to/joaooliveiratech/distributed-cache-in-net-how-to-configure-and-use-redis-3ehj)
 
-This repository provides a hands-on guide and reference implementation for integrating **Redis** as a **Distributed Cache** layer into a **.NET Web API**. 
+This repository provides a hands-on guide and reference implementation for integrating Redis as a Distributed Cache layer into a .NET Web API.
 
-The core goal is to showcase how to achieve near-instantaneous API response times by implementing the **Generic Cache Repository Pattern** and the **Double Invalidation** strategy. The solution successfully demonstrates moving the workload of fetching **1000 records** from a simulated database to an in-memory cache, proving the performance benefit of a Cache Hit.
-
-### Key Architectural Highlights:
-* **Generic Cache Abstraction:** Uses `ICacheRepository<T>` to isolate the `UserService` from Redis technology.
-* **Double Invalidation:** Ensures data consistency by invalidating both the single item key and the full collection key (`all_users_list`) on any write operation (`POST`, `PUT`, `DELETE`).
+The project demonstrates how to achieve near-instantaneous response times by moving the workload of fetching heavy datasets (1,000+ records) from a simulated database to an in-memory cache, highlighting the significant performance gap between a Cache Miss and a Cache Hit.
 
 ---
 
-## 📚 Read the Full Guide
+## What This Project Covers
 
-For a detailed, step-by-step tutorial on how this project was built, including the Docker setup, code explanations, and the analysis of the performance gains (Cache Miss vs. Cache Hit), check out the full article:
-
-> **[Article](https://dev.to/joaooliveiratech/distributed-cache-in-net-how-to-configure-and-use-redis-3ehj)**
-
----
-
-## Prerequisites
-
-To run this project, you need to have installed:
-
-1.  **[.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)**
-2.  **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** (Required to run the Redis container)
+* Generic Cache Repository Pattern: Implementing `ICacheRepository<T>` to decouple business logic from the caching provider.
+* Double Invalidation Strategy: Maintaining data consistency by clearing both individual keys and collection keys on data updates.
+* Performance Benchmarking: Comparison of response times between database fetching and Redis retrieval.
+* Serialization: Handling complex objects using JSON serialization for Redis storage.
 
 ---
 
-## How to Run the Project Locally
+## Concepts Overview
 
-Follow these steps in your terminal:
+### Cache-Aside Pattern
 
-### Step 1: Start the Redis Container
+The application first checks the cache. If the data is missing (Cache Miss), it fetches it from the database and stores it in the cache for future requests.
+
+### Double Invalidation
+
+To prevent "stale data" (showing old info after an update), this project implements a strategy where any write operation (`POST`, `PUT`, `DELETE`) automatically removes:
+
+1. The specific item key (e.g., `user:123`)
+2. The collection key (e.g., all_users_list)
+
+This ensures that the next `GET` request is forced to fetch fresh data from the database.
+
+---
+
+## Tech Stack
+
+* .NET 9 (Web API)
+* Redis (Distributed Cache)
+* StackExchange.Redis (Client library)
+* Docker (Local environment)
+
+---
+
+## Environment Setup
+
+### Prerequisites
+
+* .NET 9 SDK
+* Docker Desktop
+
+### Step 1: Start Redis
+
+Run the following command to start a local Redis instance:
 
 ```bash
 docker run --name my-redis -d -p 6379:6379 redis
 ```
 
-### Step 2: Start the .NET API
+### Step 2: Run the API
 
-Navigate to the solution root (RedisCacheApi) and start the API project.
+Navigate to the project directory and execute:
 
 ```bash
-# Example command from the solution root
 dotnet run --project src/RedisCache.Api/RedisCache.Api.csproj
 ```
 
+The API will be available (typically) at: http://localhost:5000 (check your launchSettings.json).
 
+## About
+
+This repository is part of my technical writing and learning notes.  
+If you found it useful, consider starring the repo and sharing feedback.
+
+* Author: Joao Oliveira
+* Blog: <https://joaooliveira.net>
+* Topics: .NET, Redis, Distributed Systems, Caching Patterns
+
+## Contributing
+
+Issues and pull requests are welcome.  
+If you plan a larger change, please open an issue first so we can align on scope.
+
+## License
+
+Licensed under the **MIT License**. See the `LICENSE` file for details.
